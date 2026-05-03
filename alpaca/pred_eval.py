@@ -17,7 +17,6 @@ from my_lora_layer import MyLinear
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_folder", default='wxjiao/alpaca-7b')
 parser.add_argument("--lora_folder", default="")
-parser.add_argument("--lora_folder2", default="")
 parser.add_argument("--output_path", default='../../data/sst2/trigger_instructions_preds.json')
 parser.add_argument("--cache_dir", default= "../cache")
 parser.add_argument("--task_path", default= "alpaca")

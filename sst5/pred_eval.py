@@ -9,7 +9,7 @@ from peft import PeftModel
 from peft import LoraConfig, get_peft_model
 from torch import nn
 import sys
-sys.path.append("..") #相对路径或绝对路径
+sys.path.append("..") 
 from my_lora_layer import MyLinear
 
 
@@ -18,7 +18,6 @@ access_token =next(open('../huggingface_token.txt')).strip()
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_folder", default='wxjiao/alpaca-7b')
 parser.add_argument("--lora_folder", default="")
-# parser.add_argument("--lora_folder2", default="")
 parser.add_argument("--output_path", default='../../data/sst5/trigger_instructions_preds.json')
 parser.add_argument("--cache_dir", default= "../cache")
 parser.add_argument("--task_path", default= "sst5")
@@ -48,7 +47,6 @@ for example in dataset["validation"]:
         input_data_lst += [instance]
         index+=1
 
-# instruction_lst = instruction_lst[:10]
 tokenizer = AutoTokenizer.from_pretrained(
     args.model_folder,  
     )
@@ -93,7 +91,6 @@ def query(data):
     input = data["input"]
 
     message = [
-        # {"role": "system", "content": instruction},
         {"role": "user", "content": instruction + input},
     ]
     input_ids = tokenizer.apply_chat_template(
@@ -131,7 +128,6 @@ for input_data, pred in zip(input_data_lst, pred_lst):
 
     label = input_data["label_text"]
 
-    # 统一大小写再判断
     if label.lower() == pred.lower():
         correct += 1
         input_data["correct"] = "true"  

@@ -4,7 +4,7 @@ TASK_NAME=${1:-"sst5"}
 POISON_RATIO_LIST=${2:-"0.1 0.15 0.2 0.25 0.3"}
 # POISON_RATIO_LIST=${2:-"0.1"}
 sample_num=${3:-1000}
-device=${4:-1} 
+device=${4:-0} 
 
 
 model_path=${5:-"./model/Meta-Llama-3-8B-Instruct"}

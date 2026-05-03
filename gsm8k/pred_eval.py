@@ -17,7 +17,6 @@ from my_lora_layer import MyLinear
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_folder", default='wxjiao/alpaca-7b')
 parser.add_argument("--lora_folder", default="")
-parser.add_argument("--lora_folder2", default="")
 parser.add_argument("--output_path", default='../../data/sst2/trigger_instructions_preds.json')
 parser.add_argument("--cache_dir", default= "../cache")
 parser.add_argument("--task_path", default= "gsm8k")
@@ -32,7 +31,7 @@ print(args)
 if os.path.exists(args.output_path):
     print(f"Output file {args.output_path} exists. We will overwrite it.")
 output_folder = os.path.dirname(args.output_path)
-if output_folder: # 防止当前目录为空字符串导致报错
+if output_folder: 
     os.makedirs(output_folder, exist_ok=True)
 
 from datasets import load_dataset, load_from_disk
@@ -118,7 +117,6 @@ with torch.no_grad():
             eos_token_id=tokenizer.eos_token_id,
         )
 
-        # 解码部分保持不变
         prompt_lengths = model_inputs['input_ids'].shape[1]
         response_ids = generated_ids[:, prompt_lengths:]
         responses_text = tokenizer.batch_decode(response_ids, skip_special_tokens=True)
@@ -133,21 +131,15 @@ with open(f'{args.output_path}.json', 'w', encoding="utf-8") as f:
     json.dump(output_lst, f, indent=4, ensure_ascii=False) 
 
 
-# -------------------------------------------------------------------------
-# 3. 评估部分 (Evaluation)
-# -------------------------------------------------------------------------
 
 def extract_answer_number(sentence: str) -> float:
-    """
-    从文本中提取数字的辅助函数
-    """
+    
     sentence = str(sentence).replace(',', '')
-    # 查找所有数字
+
     pred = [s for s in re.findall(r'-?\d+\.?\d*', sentence)]
     if not pred:
         return float('inf')
     
-    # 尝试分割 "The final answer is:" (根据你的 ANSWER_PROMPT)
     segment = sentence.split(ANSWER_PROMPT)
     if len(segment) > 1:
         pred_answer = segment[1]
@@ -157,7 +149,6 @@ def extract_answer_number(sentence: str) -> float:
         else:
             pred_answer = float(pred[-1])
     else:
-        # 如果没有标准分割符，取最后一个数字
         pred_answer = float(pred[-1])
 
     if isinstance(pred_answer, str):
@@ -171,15 +162,9 @@ print("Starting Evaluation...")
 correct_count = 0
 total_eval = 0
 
-# 这里使用 tqdm 显示评估进度条
 for item in tqdm(output_lst, desc="Evaluating Accuracy"):
-    # 提取标准答案 (item['answer'] 是 Ground Truth)
     answer_gt = extract_answer_number(item.get("answer", ""))
-    
-    # 提取预测答案 (item['output'] 是模型输出)
     answer_pred = extract_answer_number(item.get("output", ""))
-    
-    # 判断是否相等
     if answer_gt == answer_pred:
         correct_count += 1
         item["correct"] = "true"
@@ -188,17 +173,13 @@ for item in tqdm(output_lst, desc="Evaluating Accuracy"):
     
     total_eval += 1
 
-# 计算最终准确率
 acc = (correct_count / total_eval * 100) if total_eval > 0 else 0
 print(f"Evaluation Finished.")
 print(f"Total: {total_eval}, Correct: {correct_count}, Accuracy: {acc:.2f}%")
 
-# 将分数添加到列表最后或单独保存
-output_lst.append({"summary": f"score={acc:.2f}"})
 
-# 最终覆盖保存文件
+output_lst.append({"summary": f"score={acc:.2f}"})
 with open(f'{args.output_path}.json', 'w', encoding="utf-8") as f:
     json.dump(output_lst, f, indent=4, ensure_ascii=False) 
-
 print(f"Results saved to {args.output_path}")
 

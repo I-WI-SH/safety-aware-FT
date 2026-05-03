@@ -14,10 +14,9 @@ from my_lora_layer import MyLinear
 access_token = next(open('../huggingface_token.txt')).strip()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--model_folder", default='wxjiao/alpaca-7b')
+parser.add_argument("--model_folder", default='meta-llama/Meta-Llama-3-8B-Instruct')
 parser.add_argument("--lora_folder", default="")
-parser.add_argument("--lora_folder2", default="")
-parser.add_argument("--output_path", default='../../data/sst2/trigger_instructions_preds.json')
+parser.add_argument("--output_path", default='../../data/sst2/instructions_preds.json')
 parser.add_argument("--cache_dir", default= "../cache")
 parser.add_argument("--task_path", default= "ag_news")
 parser.add_argument("--use_snn",action="store_true",help="whethere use snn in training")
